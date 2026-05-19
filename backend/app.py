@@ -21,6 +21,11 @@ le_surface = joblib.load("../models/le_surface_top10_filtered.pkl")
 le_trans = joblib.load("../models/le_trans_top10_filtered.pkl")
 
 
+@app.route('/')
+def home():
+    return "Ceramic AI Backend is Running."
+
+
 @app.route('/predict', methods=['POST'])
 def predict():
 
