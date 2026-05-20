@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import GlazeBall from "./GlazeBall";
 
 function App() {
 
@@ -237,24 +238,31 @@ function App() {
                 {result.transparency_type}
               </p>
 
-              <h3>Predicted Color</h3>
+              <h3>3D Glaze Preview</h3>
 
               <div
                 style={{
-                  width: "250px",
-                  height: "250px",
-                  border: "2px solid black",
-                  borderRadius: "12px",
-                  backgroundColor: `rgb(
-                    ${result.rgb.r},
-                    ${result.rgb.g},
-                    ${result.rgb.b}
-                  )`
+                  width: "100%",
+                  height: "350px",
+                  backgroundColor: "#eaeaea",
+                  borderRadius: "10px",
+                  overflow: "hidden"
                 }}
-              />
+              >
+
+                <GlazeBall
+                  surface_type={result.surface_type}
+                  transparency_type={result.transparency_type}
+
+                  rgb_r={result.rgb.r}
+                  rgb_g={result.rgb.g}
+                  rgb_b={result.rgb.b}
+                />
+
+              </div>
 
               <p style={{ marginTop: "15px" }}>
-                RGB:
+                <b>RGB:</b>
                 {" "}
                 {result.rgb.r},
                 {" "}
@@ -262,6 +270,7 @@ function App() {
                 {" "}
                 {result.rgb.b}
               </p>
+
 
             </div>
 
