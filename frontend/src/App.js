@@ -43,7 +43,7 @@ function App() {
     try {
 
       const response = await axios.post(
-        "https://ceramic-ai-api.onrender.com/predict",
+        "https://ceramicml-glaze.onrender.com/predict",
         formData
       );
 
