@@ -1,63 +1,35 @@
 import React, { useState } from "react";
 import axios from "axios";
+
 import GlazeBall from "./GlazeBall";
 
 function App() {
 
   // ===================================
-  // FEATURE COLUMNS
+  // FORM DATA
   // ===================================
-  const featureColumns = [
-    'SiO2_percent', 'Al2O3_percent', 'B2O3_percent',
-    'Li2O_percent', 'K2O_percent', 'Na2O_percent',
-    'KNaO_percent', 'BeO_percent', 'MgO_percent',
-    'CaO_percent', 'SrO_percent', 'BaO_percent',
-    'ZnO_percent', 'PbO_percent', 'P2O5_percent',
-    'F_percent', 'V2O5_percent', 'Cr2O3_percent',
-    'MnO_percent', 'MnO2_percent', 'FeO_percent',
-    'Fe2O3_percent', 'CoO_percent', 'NiO_percent',
-    'CuO_percent', 'Cu2O_percent', 'CdO_percent',
-    'TiO2_percent', 'ZrO_percent', 'ZrO2_percent',
-    'SnO2_percent', 'HfO2_percent', 'Nb2O5_percent',
-    'Ta2O5_percent', 'MoO3_percent', 'WO3_percent',
-    'OsO2_percent', 'IrO2_percent', 'PtO2_percent',
-    'Ag2O_percent', 'Au2O3_percent', 'GeO2_percent',
-    'As2O3_percent', 'Sb2O3_percent', 'Bi2O3_percent',
-    'SeO2_percent', 'La2O3_percent', 'CeO2_percent',
-    'PrO2_percent', 'Pr2O3_percent', 'Nd2O3_percent',
-    'U3O8_percent', 'Sm2O3_percent', 'Eu2O3_percent',
-    'Tb2O3_percent', 'Dy2O3_percent', 'Ho2O3_percent',
-    'Er2O3_percent', 'Tm2O3_percent', 'Yb2O3_percent',
-    'Lu2O3_percent', 'target_cone_num'
-  ];
 
-  // ===================================
-  // INITIAL DATA
-  // ===================================
-  const initialData = {};
-
-  featureColumns.forEach(col => {
-    initialData[col] = 0;
+  const [formData, setFormData] = useState({
+    clay_body: "257 Porcelain",
+    glaze_paint: "Glaze1",
+    temperature_cone: 10
   });
 
-  initialData["SiO2_percent"] = 60;
-  initialData["Al2O3_percent"] = 15;
-  initialData["CaO_percent"] = 10;
-  initialData["K2O_percent"] = 5;
-  initialData["target_cone_num"] = 6;
-
-  const [formData, setFormData] = useState(initialData);
+  // ===================================
+  // RESULT
+  // ===================================
 
   const [result, setResult] = useState(null);
 
   // ===================================
   // HANDLE CHANGES
   // ===================================
+
   const handleChange = (e) => {
 
     setFormData({
       ...formData,
-      [e.target.name]: parseFloat(e.target.value)
+      [e.target.name]: e.target.value
     });
 
   };
@@ -65,6 +37,7 @@ function App() {
   // ===================================
   // PREDICT
   // ===================================
+
   const handleSubmit = async () => {
 
     try {
@@ -90,6 +63,10 @@ function App() {
 
   };
 
+  // ===================================
+  // UI
+  // ===================================
+
   return (
 
     <div
@@ -101,7 +78,12 @@ function App() {
       }}
     >
 
-      <h1 style={{ textAlign: "center" }}>
+      <h1
+        style={{
+          textAlign: "center",
+          marginBottom: "30px"
+        }}
+      >
         Ceramic AI
       </h1>
 
@@ -114,91 +96,133 @@ function App() {
       >
 
         {/* ===================================
-            LEFT SIDE INPUTS
+            LEFT PANEL
         =================================== */}
+
         <div
           style={{
             flex: 1,
             backgroundColor: "white",
             padding: "20px",
             borderRadius: "10px",
-            boxShadow: "0px 2px 8px rgba(0,0,0,0.1)",
-            maxHeight: "90vh",
-            overflowY: "scroll"
+            boxShadow: "0px 2px 8px rgba(0,0,0,0.1)"
           }}
         >
 
-          <h2>Glaze Chemistry Inputs</h2>
+          <h2>Ceramic Inputs</h2>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(2, 1fr)",
-              gap: "12px"
-            }}
-          >
+          {/* Clay Body */}
 
-            {featureColumns.map((col) => (
+          <div style={{ marginBottom: "20px" }}>
 
-              <div key={col}>
+            <label>
+              <b>Clay Body</b>
+            </label>
 
-                <label
-                  style={{
-                    fontSize: "13px",
-                    fontWeight: "bold"
-                  }}
-                >
-                  {col}
-                </label>
+            <select
+              name="clay_body"
+              value={formData.clay_body}
+              onChange={handleChange}
+              style={{
+                width: "100%",
+                padding: "10px",
+                marginTop: "8px"
+              }}
+            >
 
-                <br />
+              <option>257 Porcelain</option>
 
-                <input
-                  type="number"
-                  step="0.1"
-                  min={col === "target_cone_num" ? -22 : 0}
-                  max={col === "target_cone_num" ? 15 : 100}
-                  name={col}
-                  value={formData[col]}
-                  onChange={handleChange}
-                  style={{
-                    width: "100%",
-                    padding: "6px",
-                    marginTop: "4px"
-                  }}
-                />
+              <option>Okee Medium</option>
 
-              </div>
+              <option>Dark Star</option>
 
-            ))}
+            </select>
 
           </div>
+
+          {/* Glaze Paint */}
+
+          <div style={{ marginBottom: "20px" }}>
+
+            <label>
+              <b>Glaze Paint</b>
+            </label>
+
+            <select
+              name="glaze_paint"
+              value={formData.glaze_paint}
+              onChange={handleChange}
+              style={{
+                width: "100%",
+                padding: "10px",
+                marginTop: "8px"
+              }}
+            >
+
+              <option>Glaze1</option>
+
+              <option>Glaze7</option>
+
+              <option>Glaze12</option>
+
+              <option>Glaze13</option>
+
+              <option>Glaze19</option>
+
+            </select>
+
+          </div>
+
+          {/* Temperature */}
+
+          <div style={{ marginBottom: "20px" }}>
+
+            <label>
+              <b>Temperature_cone </b>
+            </label>
+
+            <input
+              type="number"
+              name="temperature_cone"
+              value={10}
+              disabled={true}
+              style={{
+                width: "100%",
+                padding: "10px",
+                marginTop: "8px",
+                backgroundColor: "#eeeeee"
+              }}
+            />
+
+          </div>
+
+          {/* Predict Button */}
 
           <button
             onClick={handleSubmit}
             style={{
-              marginTop: "20px",
               width: "100%",
-              padding: "12px",
+              padding: "14px",
               fontSize: "16px",
               backgroundColor: "#333",
               color: "white",
               border: "none",
-              borderRadius: "6px",
+              borderRadius: "8px",
               cursor: "pointer"
             }}
           >
-            Predict
+            Predict Glaze
           </button>
 
         </div>
 
         {/* ===================================
-            RIGHT SIDE OUTPUTS
+            RIGHT PANEL
         =================================== */}
+
         <div
           style={{
-            width: "400px",
+            width: "420px",
             backgroundColor: "white",
             padding: "20px",
             borderRadius: "10px",
@@ -211,9 +235,12 @@ function App() {
           <h2>Prediction Results</h2>
 
           {!result && (
+
             <p>
-              Enter glaze chemistry values and click Predict.
+              Select clay body and glaze paint,
+              then click Predict.
             </p>
+
           )}
 
           {result && (
@@ -238,6 +265,8 @@ function App() {
                 {result.transparency_type}
               </p>
 
+              {/* 3D PREVIEW */}
+
               <h3>3D Glaze Preview</h3>
 
               <div
@@ -252,7 +281,9 @@ function App() {
 
                 <GlazeBall
                   surface_type={result.surface_type}
-                  transparency_type={result.transparency_type}
+                  transparency_type={
+                    result.transparency_type
+                  }
 
                   rgb_r={result.rgb.r}
                   rgb_g={result.rgb.g}
@@ -261,16 +292,25 @@ function App() {
 
               </div>
 
-              <p style={{ marginTop: "15px" }}>
-                <b>RGB:</b>
-                {" "}
-                {result.rgb.r},
-                {" "}
-                {result.rgb.g},
-                {" "}
-                {result.rgb.b}
-              </p>
+              {/* RGB */}
 
+              <p style={{ marginTop: "15px" }}>
+
+                <b>RGB:</b>
+
+                {" "}
+
+                {result.rgb.r},
+
+                {" "}
+
+                {result.rgb.g},
+
+                {" "}
+
+                {result.rgb.b}
+
+              </p>
 
             </div>
 
