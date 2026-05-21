@@ -13,52 +13,26 @@ CORS(app)
 # LOAD MODELS
 # ======================================================
 
-model_material = joblib.load(
-    "../models/model_material_top10_filtered.pkl"
-)
+model_material = joblib.load("../models/model_material_top10_filtered.pkl")
+model_surface = joblib.load("../models/model_surface_top10_filtered.pkl")
+model_trans = joblib.load("../models/model_trans_top10_filtered.pkl")
+model_rgb = joblib.load("../models/model_rgb_top10_filtered.pkl")
 
-model_surface = joblib.load(
-    "../models/model_surface_top10_filtered.pkl"
-)
+scaler = joblib.load("../models/scaler_top10_filtered.pkl")
+feature_cols = joblib.load("../models/feature_cols_top10_filtered.pkl")
 
-model_trans = joblib.load(
-    "../models/model_trans_top10_filtered.pkl"
-)
-
-model_rgb = joblib.load(
-    "../models/model_rgb_top10_filtered.pkl"
-)
-
-scaler = joblib.load(
-    "../models/scaler_top10_filtered.pkl"
-)
-
-feature_cols = joblib.load(
-    "../models/feature_cols_top10_filtered.pkl"
-)
-
-le_material = joblib.load(
-    "../models/le_material_top10_filtered.pkl"
-)
-
-le_surface = joblib.load(
-    "../models/le_surface_top10_filtered.pkl"
-)
-
-le_trans = joblib.load(
-    "../models/le_trans_top10_filtered.pkl"
-)
+le_material = joblib.load("../models/le_material_top10_filtered.pkl")
+le_surface = joblib.load("../models/le_surface_top10_filtered.pkl")
+le_trans = joblib.load("../models/le_trans_top10_filtered.pkl")
 
 
 # ======================================================
 # CLAY BODY CHEMISTRY
-# Approximate chemistry
 # ======================================================
 
 CLAY_BODIES = {
 
     "257 Porcelain": {
-
         "SiO2_percent": 68.0,
         "Al2O3_percent": 22.0,
         "K2O_percent": 4.0,
@@ -69,7 +43,6 @@ CLAY_BODIES = {
     },
 
     "Okee Medium": {
-
         "SiO2_percent": 58.0,
         "Al2O3_percent": 24.0,
         "K2O_percent": 3.0,
@@ -80,7 +53,6 @@ CLAY_BODIES = {
     },
 
     "Dark Star": {
-
         "SiO2_percent": 54.0,
         "Al2O3_percent": 22.0,
         "K2O_percent": 3.0,
@@ -90,19 +62,16 @@ CLAY_BODIES = {
         "Fe2O3_percent": 6.0,
         "MnO_percent": 3.0
     }
-
 }
 
 
 # ======================================================
-# GLAZE CHEMISTRY
-# Glaze1 / 7 / 12 / 13 / 19 use same chemistry
+# GLAZE CHEMISTRY (ALL SAME)
 # ======================================================
 
 GLAZES = {
 
     "Glaze1": {
-
         "SiO2_percent": 59.5,
         "Al2O3_percent": 22.8,
         "Na2O_percent": 8.0,
@@ -113,7 +82,6 @@ GLAZES = {
     },
 
     "Glaze7": {
-
         "SiO2_percent": 59.5,
         "Al2O3_percent": 22.8,
         "Na2O_percent": 8.0,
@@ -124,7 +92,6 @@ GLAZES = {
     },
 
     "Glaze12": {
-
         "SiO2_percent": 59.5,
         "Al2O3_percent": 22.8,
         "Na2O_percent": 8.0,
@@ -135,7 +102,6 @@ GLAZES = {
     },
 
     "Glaze13": {
-
         "SiO2_percent": 59.5,
         "Al2O3_percent": 22.8,
         "Na2O_percent": 8.0,
@@ -146,7 +112,6 @@ GLAZES = {
     },
 
     "Glaze19": {
-
         "SiO2_percent": 59.5,
         "Al2O3_percent": 22.8,
         "Na2O_percent": 8.0,
@@ -155,7 +120,6 @@ GLAZES = {
         "CaO_percent": 0.3,
         "Fe2O3_percent": 0.2
     }
-
 }
 
 
@@ -163,134 +127,99 @@ GLAZES = {
 # HOME
 # ======================================================
 
-@app.route('/')
+@app.route("/")
 def home():
-
-    return "Ceramic AI Backend is Running."
+    return "Ceramic AI Backend Running"
 
 
 # ======================================================
 # PREDICT
 # ======================================================
 
-@app.route('/predict', methods=['POST'])
+@app.route("/predict", methods=["POST"])
 def predict():
 
     data = request.json
 
-    clay_body = data["clay_body"]
+    clay_body = data.get("clay_body")
+    glaze_paint = data.get("glaze_paint")
+    temperature_cone = float(data.get("temperature_cone", 10))
 
-    glaze_paint = data["glaze_paint"]
+    body = CLAY_BODIES.get(clay_body, {})
+    glaze = GLAZES.get(glaze_paint, {})
 
-    temperature_cone = float(
-        data["temperature_cone"]
-    )
+    # ==================================================
+    # WEIGHTS (YOUR REQUEST)
+    # ==================================================
 
-    # --------------------------------------------------
-    # GET CHEMISTRY
-    # --------------------------------------------------
+    body_weight = 100 / 100   # = 1.0
+    glaze_weight = 10 / 100   # = 0.1
 
-    body = CLAY_BODIES[clay_body]
+    # ==================================================
+    # INIT FULL FEATURE VECTOR
+    # ==================================================
 
-    glaze = GLAZES[glaze_paint]
+    combined = {col: 0.0 for col in feature_cols}
 
-    # --------------------------------------------------
-    # COMBINE
-    #
-    # 100 g body
-    # 10 g glaze
-    #
-    # total = 110
-    # --------------------------------------------------
+    # ==================================================
+    # ADD BODY
+    # ==================================================
 
-    body_weight = 100 / 100
-    glaze_weight = 10 / 100
-
-    combined = {}
-
-    # ALL POSSIBLE FEATURES
-    for col in feature_cols:
-
-        combined[col] = 0.0
-
-    # BODY
     for oxide, value in body.items():
 
-        combined[oxide] += (
-            value * body_weight
-        )
+        if oxide in combined:
+            combined[oxide] += value * body_weight
 
-    # GLAZE
+    # ==================================================
+    # ADD GLAZE
+    # ==================================================
+
     for oxide, value in glaze.items():
 
-        combined[oxide] += (
-            value * glaze_weight
-        )
+        if oxide in combined:
+            combined[oxide] += value * glaze_weight
 
-    # TEMPERATURE CONE
-    combined["target_cone_num"] = (
-        temperature_cone
-    )
+    # ==================================================
+    # CONE
+    # ==================================================
 
-    # --------------------------------------------------
-    # ML INPUT
-    # --------------------------------------------------
+    combined["target_cone_num"] = temperature_cone
 
-    X = pd.DataFrame([combined])
+    # ==================================================
+    # MODEL INPUT
+    # ==================================================
 
-    X = X[feature_cols]
-
+    X = pd.DataFrame([combined])[feature_cols]
     X_scaled = scaler.transform(X)
 
-    # --------------------------------------------------
+    # ==================================================
     # PREDICTIONS
-    # --------------------------------------------------
+    # ==================================================
 
-    mat_pred = model_material.predict(
-        X_scaled
-    )[0]
+    mat_pred = model_material.predict(X_scaled)[0]
+    surf_pred = model_surface.predict(X_scaled)[0]
+    trans_pred = model_trans.predict(X_scaled)[0]
+    rgb_pred = model_rgb.predict(X_scaled)[0]
 
-    surf_pred = model_surface.predict(
-        X_scaled
-    )[0]
-
-    trans_pred = model_trans.predict(
-        X_scaled
-    )[0]
-
-    rgb_pred = model_rgb.predict(
-        X_scaled
-    )[0]
-
-    # --------------------------------------------------
-    # RETURN
-    # --------------------------------------------------
+    # ==================================================
+    # RESPONSE
+    # ==================================================
 
     return jsonify({
 
         "material_type":
-            le_material.inverse_transform(
-                [mat_pred]
-            )[0],
+            le_material.inverse_transform([mat_pred])[0],
 
         "surface_type":
-            le_surface.inverse_transform(
-                [surf_pred]
-            )[0],
+            le_surface.inverse_transform([surf_pred])[0],
 
         "transparency_type":
-            le_trans.inverse_transform(
-                [trans_pred]
-            )[0],
+            le_trans.inverse_transform([trans_pred])[0],
 
         "rgb": {
-
             "r": int(rgb_pred[0]),
-
             "g": int(rgb_pred[1]),
-
             "b": int(rgb_pred[2])
-
         }
 
     })
@@ -301,8 +230,4 @@ def predict():
 # ======================================================
 
 if __name__ == "__main__":
-
-    app.run(
-        host="0.0.0.0",
-        port=10000
-    )
+    app.run(host="0.0.0.0", port=10000)
