@@ -145,7 +145,7 @@ function App() {
           <div style={{ marginBottom: "20px" }}>
 
             <label>
-              <b>Glaze Paint</b>
+              <b>Glaze</b>
             </label>
 
             <select
