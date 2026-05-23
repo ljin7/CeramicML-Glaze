@@ -150,7 +150,7 @@ def predict():
     data = request.json
 
     clay_body = data.get("clay_body")
-    glaze_paint = data.get("glaze_paint")
+    glaze_paint = data.get("glaze")
     temperature_cone = float(data.get("temperature_cone", 10))
 
     body = CLAY_BODIES.get(clay_body, {})
