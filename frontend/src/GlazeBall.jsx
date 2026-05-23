@@ -1,4 +1,5 @@
 import React, { useRef } from "react";
+
 import * as THREE from "three";
 
 import { Canvas, useFrame } from "@react-three/fiber";
@@ -6,7 +7,8 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import {
   OrbitControls,
   Environment,
-  useTexture
+  useTexture,
+  useGLTF
 } from "@react-three/drei";
 
 
@@ -120,7 +122,7 @@ const TRANSPARENCY_PRESETS = {
 
 
 // ======================================================
-// CERAMIC BALL MESH
+// CERAMIC MODEL
 // ======================================================
 
 function CeramicMesh({
@@ -131,10 +133,17 @@ function CeramicMesh({
   rgb_b
 }) {
 
-  const meshRef = useRef();
+  const groupRef = useRef();
 
-  // Texture
-  const texture = useTexture("/textures/example.jpg");
+  // Load model
+  const { scene } = useGLTF(
+    "/models/ceramic.glb"
+  );
+
+  // Load texture
+  const texture = useTexture(
+    "/textures/example.jpg"
+  );
 
   texture.wrapS = THREE.RepeatWrapping;
   texture.wrapT = THREE.RepeatWrapping;
@@ -151,59 +160,80 @@ function CeramicMesh({
     TRANSPARENCY_PRESETS[transparency_type] ||
     TRANSPARENCY_PRESETS["Opaque"];
 
-  // Slow rotation
+  // Rotate model slowly
   useFrame(() => {
 
-    if (meshRef.current) {
-      meshRef.current.rotation.y += 0.003;
+    if (groupRef.current) {
+
+      groupRef.current.rotation.y += 0.003;
+
     }
 
   });
 
+  // Apply material to all meshes
+  scene.traverse((child) => {
+
+    if (child.isMesh) {
+
+      child.material = new THREE.MeshPhysicalMaterial({
+
+        map: texture,
+
+        color: new THREE.Color(
+          rgb_r / 255,
+          rgb_g / 255,
+          rgb_b / 255
+        ),
+
+        roughness: surface.roughness,
+
+        metalness: surface.metalness,
+
+        clearcoat: surface.clearcoat,
+
+        clearcoatRoughness:
+          surface.clearcoatRoughness,
+
+        transmission:
+          transparency.transmission,
+
+        opacity:
+          transparency.opacity,
+
+        transparent: true,
+
+        thickness:
+          transparency.thickness,
+
+        ior:
+          transparency.ior,
+
+        envMapIntensity: 1.5
+
+      });
+
+      child.castShadow = true;
+      child.receiveShadow = true;
+
+    }
+
+  });
+
+  const box = new THREE.Box3().setFromObject(scene);
+  const center = box.getCenter(new THREE.Vector3());
+
+  scene.position.sub(center);
+
+
   return (
 
-    <mesh
-      ref={meshRef}
-      rotation={[0.2, 0.4, 0]}
-    >
-
-      <sphereGeometry args={[1, 128, 128]} />
-
-      <meshPhysicalMaterial
-
-        map={texture}
-
-        color={
-          new THREE.Color(
-            rgb_r / 255,
-            rgb_g / 255,
-            rgb_b / 255
-          )
-        }
-
-        roughness={surface.roughness}
-        metalness={surface.metalness}
-
-        clearcoat={surface.clearcoat}
-        clearcoatRoughness={
-          surface.clearcoatRoughness
-        }
-
-        transmission={transparency.transmission}
-
-        opacity={transparency.opacity}
-
-        transparent={true}
-
-        thickness={transparency.thickness}
-
-        ior={transparency.ior}
-
-        envMapIntensity={1.5}
-
-      />
-
-    </mesh>
+    <primitive
+      ref={groupRef}
+      object={scene}
+      scale={1.5}
+      position={[0, -50, 0]}
+    />
 
   );
 
@@ -219,19 +249,21 @@ export default function GlazeBall(props) {
   return (
 
     <Canvas
+      shadows
       camera={{
-        position: [0, 0, 4],
+        position: [0, 0, 5],
         fov: 45
       }}
     >
 
-      {/* Lighting */}
+      {/* Lights */}
 
-      <ambientLight intensity={0.6} />
+      <ambientLight intensity={0.7} />
 
       <directionalLight
         position={[5, 5, 5]}
         intensity={2}
+        castShadow
       />
 
       <directionalLight
@@ -239,15 +271,15 @@ export default function GlazeBall(props) {
         intensity={1}
       />
 
-      {/* HDR environment */}
+      {/* Environment */}
 
       <Environment preset="studio" />
 
-      {/* Ceramic sphere */}
+      {/* Ceramic model */}
 
       <CeramicMesh {...props} />
 
-      {/* Mouse orbit */}
+      {/* Controls */}
 
       <OrbitControls
         enablePan={false}
