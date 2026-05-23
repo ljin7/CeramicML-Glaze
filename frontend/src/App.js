@@ -226,7 +226,7 @@ function App() {
               marginTop: "10px"
             }}
           >
-            Predict Glaze
+            Predict
           </button>
 
         </div>
@@ -298,7 +298,7 @@ function App() {
               {/* 3D PREVIEW */}
 
               <h3 style={{ marginBottom: "15px" }}>
-                3D Glaze Preview
+                3D Preview
               </h3>
 
               <div
