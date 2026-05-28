@@ -79,7 +79,7 @@ CLAY_BODIES = {
 
 GLAZES = {
 
-    "Glaze1": {
+    "Glaze1_Gustin's Carbon Trap Shino": {
         "SiO2_percent": 59.5,
         "Al2O3_percent": 22.8,
         "Na2O_percent": 8.0,
@@ -89,45 +89,119 @@ GLAZES = {
         "Fe2O3_percent": 0.2
     },
 
-    "Glaze7": {
-        "SiO2_percent": 59.5,
-        "Al2O3_percent": 22.8,
-        "Na2O_percent": 8.0,
-        "K2O_percent": 2.8,
-        "Li2O_percent": 1.2,
-        "CaO_percent": 0.3,
-        "Fe2O3_percent": 0.2
+    "Glaze7_Bird's Beak": {
+        "SiO2_percent": 65.31,
+        "Al2O3_percent": 9.75,
+        "CaO_percent": 11.15,
+        "MgO_percent": 4.18,
+        "K2O_percent": 2.79,
+        "Na2O_percent": 0.79,
+        "TiO2_percent": 5.06,
+        "CoO_percent": 0.84,
+        "Fe2O3_percent": 0.12
     },
 
-    "Glaze12": {
-        "SiO2_percent": 59.5,
-        "Al2O3_percent": 22.8,
-        "Na2O_percent": 8.0,
-        "K2O_percent": 2.8,
-        "Li2O_percent": 1.2,
-        "CaO_percent": 0.3,
-        "Fe2O3_percent": 0.2
+    "Glaze9_Star Blue": {
+        "SiO2_percent": 62.84,
+        "Al2O3_percent": 10.47,
+        "B2O3_percent": 4.58,
+        "CaO_percent": 8.92,
+        "MgO_percent": 1.41,
+        "K2O_percent": 5.47,
+        "Na2O_percent": 1.56,
+        "ZnO_percent": 3.90,
+        "CuO_percent": 1.95,
+        "CoO_percent": 0.50,
+        "Fe2O3_percent": 0.18
     },
 
-    "Glaze13": {
-        "SiO2_percent": 59.5,
-        "Al2O3_percent": 22.8,
-        "Na2O_percent": 8.0,
-        "K2O_percent": 2.8,
-        "Li2O_percent": 1.2,
-        "CaO_percent": 0.3,
-        "Fe2O3_percent": 0.2
+    "Glaze12_Val Cushing Copper Blue Green": {
+        "SiO2_percent": 49.86,
+        "Al2O3_percent": 16.24,
+        "CaO_percent": 18.91,
+        "K2O_percent": 2.47,
+        "Na2O_percent": 1.28,
+        "MgO_percent": 0.22,
+        "CuO_percent": 1.43,
+        "SnO2_percent": 3.77,
+        "Fe2O3_percent": 0.15
     },
 
-    "Glaze19": {
-        "SiO2_percent": 59.5,
-        "Al2O3_percent": 22.8,
-        "Na2O_percent": 8.0,
-        "K2O_percent": 2.8,
-        "Li2O_percent": 1.2,
-        "CaO_percent": 0.3,
-        "Fe2O3_percent": 0.2
-    }
+    "Glaze13_Rutile": {
+        "SiO2_percent": 60.94,
+        "Al2O3_percent": 12.68,
+        "CaO_percent": 11.72,
+        "MgO_percent": 3.02,
+        "K2O_percent": 3.56,
+        "Na2O_percent": 1.01,
+        "TiO2_percent": 6.64,
+        "Fe2O3_percent": 0.24
+    },
+
+    "Glaze14_Oribe": {
+        "SiO2_percent": 49.72,
+        "Al2O3_percent": 12.51,
+        "CaO_percent": 13.42,
+        "MgO_percent": 1.86,
+        "K2O_percent": 3.44,
+        "Na2O_percent": 0.98,
+        "CuO_percent": 5.58,
+        "P2O5_percent": 0.36,
+        "Fe2O3_percent": 0.13
+    },
+
+    "Glaze15_Coleman's Teadust": {
+        "SiO2_percent": 56.87,
+        "Al2O3_percent": 11.08,
+        "CaO_percent": 10.18,
+        "MgO_percent": 1.91,
+        "K2O_percent": 4.14,
+        "Na2O_percent": 1.18,
+        "Fe2O3_percent": 13.64
+    },
+
+    "Glaze17_Red Fish Blue Fish": {
+        "SiO2_percent": 60.21,
+        "Al2O3_percent": 10.52,
+        "B2O3_percent": 5.18,
+        "CaO_percent": 8.64,
+        "K2O_percent": 5.08,
+        "Na2O_percent": 1.44,
+        "SnO2_percent": 2.68,
+        "CuO_percent": 0.17,
+        "CoO_percent": 0.33,
+        "MgO_percent": 0.32,
+        "Fe2O3_percent": 0.16
+    }, 
+
+    "Glaze_Mary's Red": {
+        "SiO2_percent": 59.74,
+        "Al2O3_percent": 8.91,
+        "B2O3_percent": 1.92,
+        "CaO_percent": 6.77,
+        "ZnO_percent": 10.13,
+        "K2O_percent": 5.32,
+        "Na2O_percent": 1.51,
+        "SrO_percent": 1.38,
+        "Li2O_percent": 0.83,
+        "SnO2_percent": 2.74,
+        "CuO_percent": 0.35,
+        "MgO_percent": 0.22,
+        "Fe2O3_percent": 0.18
+    },     
+
+    "Glaze_Darcy's Sky Blue": {
+        "SiO2_percent": 50.92,
+        "Al2O3_percent": 12.84,
+        "Na2O_percent": 8.47,
+        "K2O_percent": 4.18,
+        "MgO_percent": 5.82,
+        "CaO_percent": 3.14,
+        "ZrO2_percent": 12.56,
+        "CoO_percent": 0.54,
+        "Fe2O3_percent": 0.18
+    } 
+
 }
 
 

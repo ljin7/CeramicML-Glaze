@@ -170,15 +170,26 @@ function App() {
               }}
             >
 
-              <option>Glaze1</option>
+              <option>Glaze1_Gustin's Carbon Trap Shino</option>
 
-              <option>Glaze7</option>
+              <option>Glaze7_Bird's Beak</option>
 
-              <option>Glaze12</option>
+              <option>Glaze9_Star Blue</option>
 
-              <option>Glaze13</option>
+              <option>Glaze12_Val Cushing Copper Blue Green</option>
 
-              <option>Glaze19</option>
+              <option>Glaze13_Rutile</option>
+
+              <option>Glaze14_Oribe</option>
+
+              <option>Glaze15_Coleman's Teadust</option>
+
+              <option>Glaze17_Red Fish Blue Fish</option>
+
+              <option>Glaze_Mary's Red</option>
+
+              <option>Glaze_Darcy's Sky Blue</option>
+
 
             </select>
 
