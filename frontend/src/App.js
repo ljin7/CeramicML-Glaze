@@ -76,14 +76,16 @@ function App() {
         backgroundColor: "#f5f5f5",
         minHeight: "100vh",
         maxWidth: "1400px",
-        margin: "0 auto"
+        margin: "0 auto",
+        color: "#111111"
       }}
     >
 
       <h1
         style={{
           textAlign: "center",
-          marginBottom: "30px"
+          marginBottom: "24px",
+          fontSize: "38px"
         }}
       >
         Ceramic AI
@@ -92,8 +94,9 @@ function App() {
       <div
         style={{
           display: "flex",
-          gap: "30px",
-          alignItems: "stretch"
+          gap: "20px",
+          alignItems: "flex-start",
+          justifyContent: "center"
         }}
       >
 
@@ -103,22 +106,22 @@ function App() {
 
         <div
           style={{
-            flex: 1,
-            minHeight: "500px",
+            width: "620px",
+            minHeight: "620px",
             backgroundColor: "white",
-            padding: "30px",
-            borderRadius: "12px",
+            padding: "24px",
+            borderRadius: "14px",
             boxShadow: "0px 2px 10px rgba(0,0,0,0.1)"
           }}
         >
 
-          <h2 style={{ marginBottom: "25px" }}>
+          <h2 style={{ marginBottom: "22px" }}>
             Ceramic Inputs
           </h2>
 
           {/* Clay Body */}
 
-          <div style={{ marginBottom: "25px" }}>
+          <div style={{ marginBottom: "22px" }}>
 
             <label>
               <b>Clay Body</b>
@@ -134,6 +137,8 @@ function App() {
                 marginTop: "8px",
                 borderRadius: "8px",
                 border: "1px solid #cccccc",
+                backgroundColor: "white",
+                color: "#111111",
                 fontSize: "15px"
               }}
             >
@@ -150,7 +155,7 @@ function App() {
 
           {/* Glaze Paint */}
 
-          <div style={{ marginBottom: "25px" }}>
+          <div style={{ marginBottom: "22px" }}>
 
             <label>
               <b>Glaze</b>
@@ -166,30 +171,51 @@ function App() {
                 marginTop: "8px",
                 borderRadius: "8px",
                 border: "1px solid #cccccc",
+                backgroundColor: "white",
+                color: "#111111",
                 fontSize: "15px"
               }}
             >
 
-              <option>Glaze1_Gustin's Carbon Trap Shino</option>
+              <option>
+                Glaze1_Gustin's Carbon Trap Shino
+              </option>
 
-              <option>Glaze7_Bird's Beak</option>
+              <option>
+                Glaze7_Bird's Beak
+              </option>
 
-              <option>Glaze9_Star Blue</option>
+              <option>
+                Glaze9_Star Blue
+              </option>
 
-              <option>Glaze12_Val Cushing Copper Blue Green</option>
+              <option>
+                Glaze12_Val Cushing Copper Blue Green
+              </option>
 
-              <option>Glaze13_Rutile</option>
+              <option>
+                Glaze13_Rutile
+              </option>
 
-              <option>Glaze14_Oribe</option>
+              <option>
+                Glaze14_Oribe
+              </option>
 
-              <option>Glaze15_Coleman's Teadust</option>
+              <option>
+                Glaze15_Coleman's Teadust
+              </option>
 
-              <option>Glaze17_Red Fish Blue Fish</option>
+              <option>
+                Glaze17_Red Fish Blue Fish
+              </option>
 
-              <option>Glaze_Mary's Red</option>
+              <option>
+                Glaze_Mary's Red
+              </option>
 
-              <option>Glaze_Darcy's Sky Blue</option>
-
+              <option>
+                Glaze_Darcy's Sky Blue
+              </option>
 
             </select>
 
@@ -197,7 +223,7 @@ function App() {
 
           {/* Temperature */}
 
-          <div style={{ marginBottom: "25px" }}>
+          <div style={{ marginBottom: "22px" }}>
 
             <label>
               <b>Temperature Cone</b>
@@ -215,6 +241,7 @@ function App() {
                 borderRadius: "8px",
                 border: "1px solid #cccccc",
                 backgroundColor: "#eeeeee",
+                color: "#111111",
                 fontSize: "15px"
               }}
             />
@@ -229,12 +256,13 @@ function App() {
               width: "100%",
               padding: "16px",
               fontSize: "17px",
-              backgroundColor: "#333",
+              backgroundColor: "#333333",
               color: "white",
               border: "none",
               borderRadius: "10px",
               cursor: "pointer",
-              marginTop: "10px"
+              marginTop: "8px",
+              fontWeight: "bold"
             }}
           >
             Predict
@@ -248,16 +276,16 @@ function App() {
 
         <div
           style={{
-            flex: 1,
-            minHeight: "500px",
+            width: "620px",
+            minHeight: "620px",
             backgroundColor: "white",
-            padding: "30px",
-            borderRadius: "12px",
+            padding: "24px",
+            borderRadius: "14px",
             boxShadow: "0px 2px 10px rgba(0,0,0,0.1)"
           }}
         >
 
-          <h2 style={{ marginBottom: "25px" }}>
+          <h2 style={{ marginBottom: "22px" }}>
             Prediction Results
           </h2>
 
@@ -265,7 +293,7 @@ function App() {
 
             <div
               style={{
-                height: "100%",
+                height: "500px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -288,19 +316,19 @@ function App() {
 
             <div>
 
-              <p style={{ marginBottom: "20px" }}>
+              <p style={{ marginBottom: "18px" }}>
                 <b>Material Type:</b>
                 <br />
                 {result.material_type}
               </p>
 
-              <p style={{ marginBottom: "20px" }}>
+              <p style={{ marginBottom: "18px" }}>
                 <b>Surface Type:</b>
                 <br />
                 {result.surface_type}
               </p>
 
-              <p style={{ marginBottom: "20px" }}>
+              <p style={{ marginBottom: "18px" }}>
                 <b>Transparency:</b>
                 <br />
                 {result.transparency_type}
@@ -308,7 +336,7 @@ function App() {
 
               {/* 3D PREVIEW */}
 
-              <h3 style={{ marginBottom: "15px" }}>
+              <h3 style={{ marginBottom: "12px" }}>
                 3D Preview
               </h3>
 
@@ -316,9 +344,10 @@ function App() {
                 style={{
                   width: "100%",
                   height: "420px",
-                  backgroundColor: "#eaeaea",
+                  backgroundColor: "#000000",
                   borderRadius: "12px",
-                  overflow: "hidden"
+                  overflow: "hidden",
+                  border: "1px solid #333333"
                 }}
               >
 
@@ -339,7 +368,7 @@ function App() {
 
               <p
                 style={{
-                  marginTop: "20px",
+                  marginTop: "18px",
                   fontSize: "16px"
                 }}
               >

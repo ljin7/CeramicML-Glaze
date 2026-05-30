@@ -303,6 +303,9 @@ export default function GlazeBall(props) {
         position: [0, 0, 5],
         fov: 45
       }}
+      style={{
+        background: "#000000"
+      }}
     >
 
       {/* Lights */}
