@@ -223,6 +223,33 @@ GLAZES = {
 def home():
     return "Ceramic AI Backend Running"
 
+# ======================================================
+# NORMALIZE CHEMISTRY TO 100%
+# ======================================================
+
+def normalize_to_100(combined_dict):
+
+    total = 0.0
+
+    for key, value in combined_dict.items():
+
+        if key != "target_cone_num":
+            total += value
+
+    if total <= 0:
+        return combined_dict
+
+    normalized = {}
+
+    for key, value in combined_dict.items():
+
+        if key == "target_cone_num":
+            normalized[key] = value
+
+        else:
+            normalized[key] = (value / total) * 100.0
+
+    return normalized
 
 # ======================================================
 # PREDICT
@@ -248,7 +275,7 @@ def predict():
     glaze_weight_cls = 0.1
 
     # ==================================================
-    # RGB WEIGHTS (UPDATED)
+    # RGB WEIGHTS
     # ==================================================
 
     body_weight_rgb = 0.5
@@ -258,49 +285,90 @@ def predict():
     # BUILD CLASSIFICATION INPUT
     # ==================================================
 
-    combined_cls = {col: 0.0 for col in feature_cols}
+    combined_cls = {
+        col: 0.0 for col in feature_cols
+    }
 
     for oxide, value in body.items():
+
         if oxide in combined_cls:
             combined_cls[oxide] += value * body_weight_cls
 
     for oxide, value in glaze.items():
+
         if oxide in combined_cls:
             combined_cls[oxide] += value * glaze_weight_cls
 
     combined_cls["target_cone_num"] = temperature_cone
 
-    X_cls = pd.DataFrame([combined_cls]).reindex(columns=feature_cols, fill_value=0)
+    X_cls = pd.DataFrame([combined_cls])
+
+    X_cls = X_cls.reindex(
+        columns=feature_cols,
+        fill_value=0
+    )
+
     X_cls_scaled = scaler_cls.transform(X_cls)
 
     # ==================================================
     # BUILD RGB INPUT
     # ==================================================
 
-    combined_rgb = {col: 0.0 for col in feature_cols}
+    combined_rgb = {
+        col: 0.0 for col in feature_cols
+    }
 
     for oxide, value in body.items():
+
         if oxide in combined_rgb:
             combined_rgb[oxide] += value * body_weight_rgb
 
     for oxide, value in glaze.items():
+
         if oxide in combined_rgb:
             combined_rgb[oxide] += value * glaze_weight_rgb
 
+    # ==================================================
+    # NORMALIZE RGB CHEMISTRY TO 100%
+    # ==================================================
+
+    combined_rgb = normalize_to_100(combined_rgb)
+
     combined_rgb["target_cone_num"] = temperature_cone
 
-    X_rgb = pd.DataFrame([combined_rgb]).reindex(columns=feature_cols, fill_value=0)
+    X_rgb = pd.DataFrame([combined_rgb])
+
+    X_rgb = X_rgb.reindex(
+        columns=feature_cols,
+        fill_value=0
+    )
+
     X_rgb_scaled = scaler_rgb.transform(X_rgb)
 
     # ==================================================
-    # PREDICTIONS
+    # CLASSIFICATION PREDICTIONS
     # ==================================================
 
-    mat_pred = model_material.predict(X_cls_scaled)[0]
-    surf_pred = model_surface.predict(X_cls_scaled)[0]
-    trans_pred = model_trans.predict(X_cls_scaled)[0]
+    mat_pred = model_material.predict(
+        X_cls_scaled
+    )[0]
 
-    rgb_pred = model_rgb.predict(X_rgb_scaled)[0]
+    surf_pred = model_surface.predict(
+        X_cls_scaled
+    )[0]
+
+    trans_pred = model_trans.predict(
+        X_cls_scaled
+    )[0]
+
+    # ==================================================
+    # RGB PREDICTION
+    # ==================================================
+
+    rgb_pred = model_rgb.predict(
+        X_rgb_scaled
+    )[0]
+
     rgb_pred = np.clip(rgb_pred, 0, 255)
 
     # ==================================================
@@ -309,9 +377,20 @@ def predict():
 
     return jsonify({
 
-        "material_type": le_material.inverse_transform([mat_pred])[0],
-        "surface_type": le_surface.inverse_transform([surf_pred])[0],
-        "transparency_type": le_trans.inverse_transform([trans_pred])[0],
+        "material_type":
+            le_material.inverse_transform(
+                [mat_pred]
+            )[0],
+
+        "surface_type":
+            le_surface.inverse_transform(
+                [surf_pred]
+            )[0],
+
+        "transparency_type":
+            le_trans.inverse_transform(
+                [trans_pred]
+            )[0],
 
         "rgb": {
             "r": int(rgb_pred[0]),
@@ -321,10 +400,13 @@ def predict():
 
     })
 
-
 # ======================================================
 # RUN
 # ======================================================
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
+
+    app.run(
+        host="0.0.0.0",
+        port=10000
+    )
