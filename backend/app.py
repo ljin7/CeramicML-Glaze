@@ -5,7 +5,6 @@ import pandas as pd
 import numpy as np
 import joblib
 
-
 app = Flask(__name__)
 
 CORS(app, resources={
@@ -17,62 +16,35 @@ CORS(app, resources={
     }
 })
 
-
 # ======================================================
 # LOAD MODELS
 # ======================================================
 
-model_material = joblib.load(
-    "../models/model_material_top10_filtered.pkl"
-)
-
-model_surface = joblib.load(
-    "../models/model_surface_top10_filtered.pkl"
-)
-
-model_trans = joblib.load(
-    "../models/model_trans_top10_filtered.pkl"
-)
-
-model_rgb = joblib.load(
-    "../models/model_rgb_top10_filtered.pkl"
-)
+model_material = joblib.load("../models/model_material_top10_filtered.pkl")
+model_surface  = joblib.load("../models/model_surface_top10_filtered.pkl")
+model_trans    = joblib.load("../models/model_trans_top10_filtered.pkl")
+model_rgb      = joblib.load("../models/model_rgb_top10_filtered.pkl")
 
 # ======================================================
 # LOAD SCALERS
 # ======================================================
 
-scaler_cls = joblib.load(
-    "../models/scaler_cls_top10_filtered.pkl"
-)
-
-scaler_rgb = joblib.load(
-    "../models/scaler_rgb_top10_filtered.pkl"
-)
+scaler_cls = joblib.load("../models/scaler_cls_top10_filtered.pkl")
+scaler_rgb = joblib.load("../models/scaler_rgb_top10_filtered.pkl")
 
 # ======================================================
 # FEATURE COLUMNS
 # ======================================================
 
-feature_cols = joblib.load(
-    "../models/feature_cols_top10_filtered.pkl"
-)
+feature_cols = joblib.load("../models/feature_cols_top10_filtered.pkl")
 
 # ======================================================
 # LABEL ENCODERS
 # ======================================================
 
-le_material = joblib.load(
-    "../models/le_material_top10_filtered.pkl"
-)
-
-le_surface = joblib.load(
-    "../models/le_surface_top10_filtered.pkl"
-)
-
-le_trans = joblib.load(
-    "../models/le_trans_top10_filtered.pkl"
-)
+le_material = joblib.load("../models/le_material_top10_filtered.pkl")
+le_surface  = joblib.load("../models/le_surface_top10_filtered.pkl")
+le_trans    = joblib.load("../models/le_trans_top10_filtered.pkl")
 
 
 # ======================================================
@@ -112,7 +84,6 @@ CLAY_BODIES = {
         "MnO_percent": 3.0
     }
 }
-
 
 # ======================================================
 # GLAZE CHEMISTRY
@@ -242,9 +213,7 @@ GLAZES = {
         "CoO_percent": 0.54,
         "Fe2O3_percent": 0.18
     }
-
 }
-
 
 # ======================================================
 # HOME
@@ -266,100 +235,72 @@ def predict():
 
     clay_body = data.get("clay_body")
     glaze_paint = data.get("glaze_paint")
-    temperature_cone = float(
-        data.get("temperature_cone", 10)
-    )
+    temperature_cone = float(data.get("temperature_cone", 10))
 
     body = CLAY_BODIES.get(clay_body, {})
     glaze = GLAZES.get(glaze_paint, {})
 
     # ==================================================
-    # WEIGHTS
+    # CLASSIFICATION WEIGHTS
     # ==================================================
 
-    body_weight = 1.0
-    glaze_weight = 0.1
+    body_weight_cls = 1.0
+    glaze_weight_cls = 0.1
 
     # ==================================================
-    # INIT FEATURES
+    # RGB WEIGHTS (UPDATED)
     # ==================================================
 
-    combined = {
-        col: 0.0 for col in feature_cols
-    }
+    body_weight_rgb = 0.5
+    glaze_weight_rgb = 0.5
 
     # ==================================================
-    # ADD BODY
+    # BUILD CLASSIFICATION INPUT
     # ==================================================
+
+    combined_cls = {col: 0.0 for col in feature_cols}
 
     for oxide, value in body.items():
-
-        if oxide in combined:
-            combined[oxide] += value * body_weight
-
-    # ==================================================
-    # ADD GLAZE
-    # ==================================================
+        if oxide in combined_cls:
+            combined_cls[oxide] += value * body_weight_cls
 
     for oxide, value in glaze.items():
+        if oxide in combined_cls:
+            combined_cls[oxide] += value * glaze_weight_cls
 
-        if oxide in combined:
-            combined[oxide] += value * glaze_weight
+    combined_cls["target_cone_num"] = temperature_cone
 
-    # ==================================================
-    # CONE
-    # ==================================================
-
-    combined["target_cone_num"] = temperature_cone
+    X_cls = pd.DataFrame([combined_cls]).reindex(columns=feature_cols, fill_value=0)
+    X_cls_scaled = scaler_cls.transform(X_cls)
 
     # ==================================================
-    # MODEL INPUT
+    # BUILD RGB INPUT
     # ==================================================
 
-    X = pd.DataFrame([combined])
+    combined_rgb = {col: 0.0 for col in feature_cols}
 
-    # enforce exact order
-    X = X.reindex(
-        columns=feature_cols,
-        fill_value=0
-    )
+    for oxide, value in body.items():
+        if oxide in combined_rgb:
+            combined_rgb[oxide] += value * body_weight_rgb
 
-    # ==================================================
-    # CLASSIFICATION SCALING
-    # ==================================================
+    for oxide, value in glaze.items():
+        if oxide in combined_rgb:
+            combined_rgb[oxide] += value * glaze_weight_rgb
 
-    X_cls_scaled = scaler_cls.transform(X)
+    combined_rgb["target_cone_num"] = temperature_cone
 
-    # ==================================================
-    # RGB SCALING
-    # ==================================================
-
-    X_rgb_scaled = scaler_rgb.transform(X)
+    X_rgb = pd.DataFrame([combined_rgb]).reindex(columns=feature_cols, fill_value=0)
+    X_rgb_scaled = scaler_rgb.transform(X_rgb)
 
     # ==================================================
-    # CLASSIFICATION PREDICTIONS
+    # PREDICTIONS
     # ==================================================
 
-    mat_pred = model_material.predict(
-        X_cls_scaled
-    )[0]
+    mat_pred = model_material.predict(X_cls_scaled)[0]
+    surf_pred = model_surface.predict(X_cls_scaled)[0]
+    trans_pred = model_trans.predict(X_cls_scaled)[0]
 
-    surf_pred = model_surface.predict(
-        X_cls_scaled
-    )[0]
-
-    trans_pred = model_trans.predict(
-        X_cls_scaled
-    )[0]
-
-    # ==================================================
-    # RGB PREDICTION
-    # ==================================================
-
-    rgb_pred = model_rgb.predict(
-        X_rgb_scaled
-    )[0]
-
+    rgb_pred = model_rgb.predict(X_rgb_scaled)[0]
     rgb_pred = np.clip(rgb_pred, 0, 255)
 
     # ==================================================
@@ -368,20 +309,9 @@ def predict():
 
     return jsonify({
 
-        "material_type":
-            le_material.inverse_transform(
-                [mat_pred]
-            )[0],
-
-        "surface_type":
-            le_surface.inverse_transform(
-                [surf_pred]
-            )[0],
-
-        "transparency_type":
-            le_trans.inverse_transform(
-                [trans_pred]
-            )[0],
+        "material_type": le_material.inverse_transform([mat_pred])[0],
+        "surface_type": le_surface.inverse_transform([surf_pred])[0],
+        "transparency_type": le_trans.inverse_transform([trans_pred])[0],
 
         "rgb": {
             "r": int(rgb_pred[0]),
@@ -397,7 +327,4 @@ def predict():
 # ======================================================
 
 if __name__ == "__main__":
-    app.run(
-        host="0.0.0.0",
-        port=10000
-    )
+    app.run(host="0.0.0.0", port=10000)
