@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 import pandas as pd
+import numpy as np
 import joblib
 
 
@@ -21,17 +22,57 @@ CORS(app, resources={
 # LOAD MODELS
 # ======================================================
 
-model_material = joblib.load("../models/model_material_top10_filtered.pkl")
-model_surface = joblib.load("../models/model_surface_top10_filtered.pkl")
-model_trans = joblib.load("../models/model_trans_top10_filtered.pkl")
-model_rgb = joblib.load("../models/model_rgb_top10_filtered.pkl")
+model_material = joblib.load(
+    "../models/model_material_top10_filtered.pkl"
+)
 
-scaler = joblib.load("../models/scaler_top10_filtered.pkl")
-feature_cols = joblib.load("../models/feature_cols_top10_filtered.pkl")
+model_surface = joblib.load(
+    "../models/model_surface_top10_filtered.pkl"
+)
 
-le_material = joblib.load("../models/le_material_top10_filtered.pkl")
-le_surface = joblib.load("../models/le_surface_top10_filtered.pkl")
-le_trans = joblib.load("../models/le_trans_top10_filtered.pkl")
+model_trans = joblib.load(
+    "../models/model_trans_top10_filtered.pkl"
+)
+
+model_rgb = joblib.load(
+    "../models/model_rgb_top10_filtered.pkl"
+)
+
+# ======================================================
+# LOAD SCALERS
+# ======================================================
+
+scaler_cls = joblib.load(
+    "../models/scaler_cls_top10_filtered.pkl"
+)
+
+scaler_rgb = joblib.load(
+    "../models/scaler_rgb_top10_filtered.pkl"
+)
+
+# ======================================================
+# FEATURE COLUMNS
+# ======================================================
+
+feature_cols = joblib.load(
+    "../models/feature_cols_top10_filtered.pkl"
+)
+
+# ======================================================
+# LABEL ENCODERS
+# ======================================================
+
+le_material = joblib.load(
+    "../models/le_material_top10_filtered.pkl"
+)
+
+le_surface = joblib.load(
+    "../models/le_surface_top10_filtered.pkl"
+)
+
+le_trans = joblib.load(
+    "../models/le_trans_top10_filtered.pkl"
+)
 
 
 # ======================================================
@@ -74,7 +115,7 @@ CLAY_BODIES = {
 
 
 # ======================================================
-# GLAZE CHEMISTRY (ALL SAME)
+# GLAZE CHEMISTRY
 # ======================================================
 
 GLAZES = {
@@ -172,7 +213,7 @@ GLAZES = {
         "CoO_percent": 0.33,
         "MgO_percent": 0.32,
         "Fe2O3_percent": 0.16
-    }, 
+    },
 
     "Glaze_Mary's Red": {
         "SiO2_percent": 59.74,
@@ -188,7 +229,7 @@ GLAZES = {
         "CuO_percent": 0.35,
         "MgO_percent": 0.22,
         "Fe2O3_percent": 0.18
-    },     
+    },
 
     "Glaze_Darcy's Sky Blue": {
         "SiO2_percent": 50.92,
@@ -200,7 +241,7 @@ GLAZES = {
         "ZrO2_percent": 12.56,
         "CoO_percent": 0.54,
         "Fe2O3_percent": 0.18
-    } 
+    }
 
 }
 
@@ -225,23 +266,27 @@ def predict():
 
     clay_body = data.get("clay_body")
     glaze_paint = data.get("glaze_paint")
-    temperature_cone = float(data.get("temperature_cone", 10))
+    temperature_cone = float(
+        data.get("temperature_cone", 10)
+    )
 
     body = CLAY_BODIES.get(clay_body, {})
     glaze = GLAZES.get(glaze_paint, {})
 
     # ==================================================
-    # WEIGHTS (YOUR REQUEST)
+    # WEIGHTS
     # ==================================================
 
-    body_weight = 100 / 100   # = 1.0
-    glaze_weight = 10 / 100   # = 0.1
+    body_weight = 1.0
+    glaze_weight = 0.1
 
     # ==================================================
-    # INIT FULL FEATURE VECTOR
+    # INIT FEATURES
     # ==================================================
 
-    combined = {col: 0.0 for col in feature_cols}
+    combined = {
+        col: 0.0 for col in feature_cols
+    }
 
     # ==================================================
     # ADD BODY
@@ -271,17 +316,51 @@ def predict():
     # MODEL INPUT
     # ==================================================
 
-    X = pd.DataFrame([combined])[feature_cols]
-    X_scaled = scaler.transform(X)
+    X = pd.DataFrame([combined])
+
+    # enforce exact order
+    X = X.reindex(
+        columns=feature_cols,
+        fill_value=0
+    )
 
     # ==================================================
-    # PREDICTIONS
+    # CLASSIFICATION SCALING
     # ==================================================
 
-    mat_pred = model_material.predict(X_scaled)[0]
-    surf_pred = model_surface.predict(X_scaled)[0]
-    trans_pred = model_trans.predict(X_scaled)[0]
-    rgb_pred = model_rgb.predict(X_scaled)[0]
+    X_cls_scaled = scaler_cls.transform(X)
+
+    # ==================================================
+    # RGB SCALING
+    # ==================================================
+
+    X_rgb_scaled = scaler_rgb.transform(X)
+
+    # ==================================================
+    # CLASSIFICATION PREDICTIONS
+    # ==================================================
+
+    mat_pred = model_material.predict(
+        X_cls_scaled
+    )[0]
+
+    surf_pred = model_surface.predict(
+        X_cls_scaled
+    )[0]
+
+    trans_pred = model_trans.predict(
+        X_cls_scaled
+    )[0]
+
+    # ==================================================
+    # RGB PREDICTION
+    # ==================================================
+
+    rgb_pred = model_rgb.predict(
+        X_rgb_scaled
+    )[0]
+
+    rgb_pred = np.clip(rgb_pred, 0, 255)
 
     # ==================================================
     # RESPONSE
@@ -290,13 +369,19 @@ def predict():
     return jsonify({
 
         "material_type":
-            le_material.inverse_transform([mat_pred])[0],
+            le_material.inverse_transform(
+                [mat_pred]
+            )[0],
 
         "surface_type":
-            le_surface.inverse_transform([surf_pred])[0],
+            le_surface.inverse_transform(
+                [surf_pred]
+            )[0],
 
         "transparency_type":
-            le_trans.inverse_transform([trans_pred])[0],
+            le_trans.inverse_transform(
+                [trans_pred]
+            )[0],
 
         "rgb": {
             "r": int(rgb_pred[0]),
@@ -312,4 +397,7 @@ def predict():
 # ======================================================
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
+    app.run(
+        host="0.0.0.0",
+        port=10000
+    )
