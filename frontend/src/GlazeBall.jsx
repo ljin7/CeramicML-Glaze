@@ -21,6 +21,9 @@ import {
 } from "@react-three/drei";
 
 
+import { Html} from "@react-three/drei";
+
+
 // ======================================================
 // SURFACE PRESETS
 // ======================================================
@@ -287,7 +290,6 @@ function CeramicMesh({
 }
 
 
-import { Html} from "@react-three/drei";
 
 function Compass() {
   const { camera } = useThree();
