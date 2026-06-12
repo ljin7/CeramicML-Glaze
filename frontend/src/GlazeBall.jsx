@@ -1,7 +1,8 @@
 import React, {
   useRef,
   useMemo,
-  useEffect
+  useEffect,
+  useState
 } from "react";
 
 import * as THREE from "three";
@@ -289,17 +290,24 @@ function CeramicMesh({
 
 }
 
-
-
 function Compass() {
   const { camera } = useThree();
   const arrowRef = useRef();
+  const [angleDeg, setAngleDeg] = useState(0);
 
   useFrame(() => {
+    // camera yaw (Y-axis rotation)
+    const yaw = camera.rotation.y;
+
+    // convert radians → degrees (0–360)
+    let deg = (-yaw * 180) / Math.PI;
+    deg = ((deg % 360) + 360) % 360;
+
+    setAngleDeg(deg.toFixed(0));
+
     if (arrowRef.current) {
-      // rotate based on camera direction
       arrowRef.current.style.transform =
-        `translate(-50%, -50%) rotate(${-camera.rotation.y}rad)`;
+        `translate(-50%, -50%) rotate(${-yaw}rad)`;
     }
   });
 
@@ -310,23 +318,26 @@ function Compass() {
           position: "absolute",
           bottom: 24,
           right: 24,
-          width: 60,
-          height: 60,
+          width: 80,
+          height: 80,
           pointerEvents: "none",
+          fontFamily: "sans-serif",
+          color: "white",
         }}
       >
-        {/* Glow background (no circle border) */}
+        {/* glow */}
         <div
           style={{
             position: "absolute",
             width: "100%",
             height: "100%",
-            background: "radial-gradient(circle, rgba(255,255,255,0.15), transparent 70%)",
+            background:
+              "radial-gradient(circle, rgba(255,255,255,0.12), transparent 70%)",
             filter: "blur(6px)",
           }}
         />
 
-        {/* Arrow */}
+        {/* arrow */}
         <div
           ref={arrowRef}
           style={{
@@ -339,30 +350,53 @@ function Compass() {
             borderRight: "7px solid transparent",
             borderBottom: "18px solid #ff3b3b",
             transformOrigin: "center",
-            transition: "transform 0.08s linear",
             filter: "drop-shadow(0 0 6px rgba(255, 60, 60, 0.8))",
           }}
         />
 
-        {/* small base dot */}
+        {/* angle text */}
         <div
           style={{
             position: "absolute",
-            top: "70%",
+            bottom: -6,
             left: "50%",
-            width: 6,
-            height: 6,
-            background: "white",
+            transform: "translateX(-50%)",
+            width: 44,
+            height: 44,
             borderRadius: "50%",
-            transform: "translate(-50%, -50%)",
-            opacity: 0.8,
+            border: "1px solid rgba(255,255,255,0.25)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: "11px",
+            color: "white",
+            background:
+              "radial-gradient(circle, rgba(255,255,255,0.08), transparent 70%)",
+            backdropFilter: "blur(4px)",
           }}
-        />
+        >
+          {/* small pointer tick */}
+          <div
+            style={{
+              position: "absolute",
+              top: 2,
+              width: 2,
+              height: 6,
+              background: "white",
+              opacity: 0.8,
+              borderRadius: 2,
+            }}
+          />
+
+          {/* angle text */}
+          <div style={{ fontWeight: 500 }}>
+            {angleDeg}°
+          </div>
+        </div>
       </div>
     </Html>
   );
 }
-
 
 
 // ======================================================
