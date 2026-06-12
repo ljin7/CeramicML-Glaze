@@ -399,6 +399,43 @@ function Compass() {
 }
 
 
+function BaseGrid({ targetRef }) {
+  const [gridData, setGridData] = useState({
+    y: -1,
+    size: 3
+  });
+
+  useEffect(() => {
+    if (!targetRef.current) return;
+
+    const box = new THREE.Box3().setFromObject(
+      targetRef.current
+    );
+
+    const size = box.getSize(
+      new THREE.Vector3()
+    );
+
+    setGridData({
+      y: box.min.y - 0.00001,
+      size: Math.max(size.x, size.z) * 1.5
+    });
+  }, [targetRef]);
+
+  return (
+    <gridHelper
+      args={[
+        gridData.size,
+        30,
+        "#666666",
+        "#333333"
+      ]}
+      position={[0, gridData.y, 0]}
+    />
+  );
+}
+
+
 // ======================================================
 // MAIN COMPONENT
 // ======================================================
@@ -462,6 +499,14 @@ export default function GlazeBall(props) {
       />
 
       <Compass />
+
+    <Center>
+      <group ref={modelRef}>
+        <CeramicMesh {...props} />
+      </group>
+    </Center>
+
+    <BaseGrid targetRef={modelRef} />
 
    
     </Canvas>
