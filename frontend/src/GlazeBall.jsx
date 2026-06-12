@@ -287,6 +287,82 @@ function CeramicMesh({
 }
 
 
+import { Html} from "@react-three/drei";
+
+function Compass() {
+  const { camera } = useThree();
+  const arrowRef = useRef();
+
+  useFrame(() => {
+    if (arrowRef.current) {
+      // rotate based on camera direction
+      arrowRef.current.style.transform =
+        `translate(-50%, -50%) rotate(${-camera.rotation.y}rad)`;
+    }
+  });
+
+  return (
+    <Html fullscreen>
+      <div
+        style={{
+          position: "absolute",
+          bottom: 24,
+          right: 24,
+          width: 60,
+          height: 60,
+          pointerEvents: "none",
+        }}
+      >
+        {/* Glow background (no circle border) */}
+        <div
+          style={{
+            position: "absolute",
+            width: "100%",
+            height: "100%",
+            background: "radial-gradient(circle, rgba(255,255,255,0.15), transparent 70%)",
+            filter: "blur(6px)",
+          }}
+        />
+
+        {/* Arrow */}
+        <div
+          ref={arrowRef}
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            width: 0,
+            height: 0,
+            borderLeft: "7px solid transparent",
+            borderRight: "7px solid transparent",
+            borderBottom: "18px solid #ff3b3b",
+            transformOrigin: "center",
+            transition: "transform 0.08s linear",
+            filter: "drop-shadow(0 0 6px rgba(255, 60, 60, 0.8))",
+          }}
+        />
+
+        {/* small base dot */}
+        <div
+          style={{
+            position: "absolute",
+            top: "70%",
+            left: "50%",
+            width: 6,
+            height: 6,
+            background: "white",
+            borderRadius: "50%",
+            transform: "translate(-50%, -50%)",
+            opacity: 0.8,
+          }}
+        />
+      </div>
+    </Html>
+  );
+}
+
+
+
 // ======================================================
 // MAIN COMPONENT
 // ======================================================
@@ -349,6 +425,9 @@ export default function GlazeBall(props) {
         enablePan={false}
       />
 
+      <Compass />
+
+   
     </Canvas>
 
   );
