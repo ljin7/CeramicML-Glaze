@@ -1,406 +1,141 @@
 import React, { useState } from "react";
-import axios from "axios";
 
-import GlazeBall from "./GlazeBall";
+import PredictPage from "./components/PredictPage";
+import HowItWorksPage from "./components/HowItWorksPage";
+import DataPage from "./components/DataPage";
+import ModelPage from "./components/ModelPage";
+import AboutPage from "./components/AboutPage";
 
-function App() {
+import {
+  FaFlask,
+  FaCogs,
+  FaDatabase,
+  FaBrain,
+  FaInfoCircle
+} from "react-icons/fa";
 
-  // ===================================
-  // FORM DATA
-  // ===================================
+export default function App() {
 
-  const [formData, setFormData] = useState({
-    clay_body: "257 Porcelain",
-    glaze_paint: "Glaze1",
-    temperature_cone: 10
-  });
+  const [tab, setTab] = useState("Predict");
 
-  // ===================================
-  // RESULT
-  // ===================================
-
-  const [result, setResult] = useState(null);
-
-  // ===================================
-  // HANDLE CHANGES
-  // ===================================
-
-  const handleChange = (e) => {
-
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-
-  };
-
-  // ===================================
-  // PREDICT
-  // ===================================
-
-  const handleSubmit = async () => {
-
-    try {
-
-      const response = await axios.post(
-        "https://ceramicml-glaze.onrender.com/predict",
-        formData
-      );
-
-      setResult(response.data);
-
-    } catch (error) {
-
-      console.error(error);
-
-      if (error.response) {
-        console.log(error.response.data);
-      }
-
-      alert("Prediction failed");
-
-    }
-
-  };
-
-  // ===================================
-  // UI
-  // ===================================
+  const tabs = [
+  { name: "Predict", icon: <FaFlask /> },
+  { name: "How It Works", icon: <FaCogs /> },
+  { name: "Data", icon: <FaDatabase /> },
+  { name: "Model", icon: <FaBrain /> },
+  { name: "About", icon: <FaInfoCircle /> }
+];
 
   return (
-
-    <div
+  
+  <div
       style={{
         padding: "20px",
-        fontFamily: "Arial",
-        backgroundColor: "#f5f5f5",
-        minHeight: "100vh",
         maxWidth: "1400px",
-        margin: "0 auto",
-        color: "#111111"
+        margin: "0 auto"
       }}
     >
 
-      <h1
-        style={{
-          textAlign: "center",
-          marginBottom: "24px",
-          fontSize: "38px"
-        }}
-      >
-        Ceramic AI
-      </h1>
+    <h1
+      style={{
+        textAlign: "center",
+        fontSize: "48px",
+        fontWeight: 900,
+        letterSpacing: "2px",
+        marginBottom: "6px",
+        background:
+          "linear-gradient(135deg, #2b1d16 0%, #5c4033 35%, #8b5a2b 65%, #d4a15a 100%)",
+        WebkitBackgroundClip: "text",
+        WebkitTextFillColor: "transparent",
+        filter: "drop-shadow(1px 2px 4px rgba(0,0,0,0.25))"
+      }}
+    >
+      Ceramic AI
+    </h1>
 
-      <div
-        style={{
-          display: "flex",
-          gap: "20px",
-          alignItems: "flex-start",
-          justifyContent: "center"
-        }}
-      >
+    <div
+      style={{
+        textAlign: "center",
+        color: "#7a5b3a",
+        fontSize: "14px",
+        letterSpacing: "2px",
+        marginBottom: "25px"
+      }}
+    >
+      AI-Powered Glaze Prediction System
+    </div>
 
-        {/* ===================================
-            LEFT PANEL
-        =================================== */}
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        gap: "15px",
+        marginBottom: "35px"
+      }}
+    >
+      {tabs.map((t) => (
 
-        <div
-          style={{
-            width: "620px",
-            minHeight: "620px",
-            backgroundColor: "white",
-            padding: "24px",
-            borderRadius: "14px",
-            boxShadow: "0px 2px 10px rgba(0,0,0,0.1)"
+        <button
+          key={t.name}
+          onClick={() => setTab(t.name)}
+
+          onMouseEnter={(e) => {
+            if (tab !== t.name) {
+              e.target.style.background = "#f0f4f3";
+            }
           }}
-        >
-
-          <h2 style={{ marginBottom: "22px" }}>
-            Ceramic Inputs
-          </h2>
-
-          {/* Clay Body */}
-
-          <div style={{ marginBottom: "22px" }}>
-
-            <label>
-              <b>Clay Body</b>
-            </label>
-
-            <select
-              name="clay_body"
-              value={formData.clay_body}
-              onChange={handleChange}
-              style={{
-                width: "100%",
-                padding: "12px",
-                marginTop: "8px",
-                borderRadius: "8px",
-                border: "1px solid #cccccc",
-                backgroundColor: "white",
-                color: "#111111",
-                fontSize: "15px"
-              }}
-            >
-
-              <option>257 Porcelain</option>
-
-              <option>Okee Medium</option>
-
-              <option>Dark Star</option>
-
-            </select>
-
-          </div>
-
-          {/* Glaze Paint */}
-
-          <div style={{ marginBottom: "22px" }}>
-
-            <label>
-              <b>Glaze</b>
-            </label>
-
-            <select
-              name="glaze_paint"
-              value={formData.glaze_paint}
-              onChange={handleChange}
-              style={{
-                width: "100%",
-                padding: "12px",
-                marginTop: "8px",
-                borderRadius: "8px",
-                border: "1px solid #cccccc",
-                backgroundColor: "white",
-                color: "#111111",
-                fontSize: "15px"
-              }}
-            >
-
-              <option>
-                Glaze1_Gustin's Carbon Trap Shino
-              </option>
-
-              <option>
-                Glaze7_Bird's Beak
-              </option>
-
-              <option>
-                Glaze9_Star Blue
-              </option>
-
-              <option>
-                Glaze12_Val Cushing Copper Blue Green
-              </option>
-
-              <option>
-                Glaze13_Rutile
-              </option>
-
-              <option>
-                Glaze14_Oribe
-              </option>
-
-              <option>
-                Glaze15_Coleman's Teadust
-              </option>
-
-              <option>
-                Glaze17_Red Fish Blue Fish
-              </option>
-
-              <option>
-                Glaze_Mary's Red
-              </option>
-
-              <option>
-                Glaze_Darcy's Sky Blue
-              </option>
-
-            </select>
-
-          </div>
-
-          {/* Temperature */}
-
-          <div style={{ marginBottom: "22px" }}>
-
-            <label>
-              <b>Temperature Cone</b>
-            </label>
-
-            <input
-              type="number"
-              name="temperature_cone"
-              value={10}
-              disabled={true}
-              style={{
-                width: "100%",
-                padding: "12px",
-                marginTop: "8px",
-                borderRadius: "8px",
-                border: "1px solid #cccccc",
-                backgroundColor: "#eeeeee",
-                color: "#111111",
-                fontSize: "15px"
-              }}
-            />
-
-          </div>
-
-          {/* Predict Button */}
-
-          <button
-            onClick={handleSubmit}
-            style={{
-              width: "100%",
-              padding: "16px",
-              fontSize: "17px",
-              backgroundColor: "#333333",
-              color: "white",
-              border: "none",
-              borderRadius: "10px",
-              cursor: "pointer",
-              marginTop: "8px",
-              fontWeight: "bold"
-            }}
-          >
-            Predict
-          </button>
-
-        </div>
-
-        {/* ===================================
-            RIGHT PANEL
-        =================================== */}
-
-        <div
-          style={{
-            width: "620px",
-            minHeight: "620px",
-            backgroundColor: "white",
-            padding: "24px",
-            borderRadius: "14px",
-            boxShadow: "0px 2px 10px rgba(0,0,0,0.1)"
+          onMouseLeave={(e) => {
+            if (tab !== t.name) {
+              e.target.style.background = "#ffffff";
+            }
           }}
-        >
+          
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            padding: "14px 24px",
+            borderRadius: "50px",
+            border: "none",
+            cursor: "pointer",
+            fontWeight: 600,
+            fontSize: "15px",
+            transition: "0.25s",
+            background:
+              tab === t.name
+                ? "linear-gradient(135deg,#92400e,#d97706)"
+                : "#ffffff",
 
-          <h2 style={{ marginBottom: "22px" }}>
-            Prediction Results
-          </h2>
+            color:
+              tab === t.name ? "white" : "#444",
 
-          {!result && (
+            boxShadow:
+              tab === t.name
+                ? "0 6px 18px rgba(77,140,123,0.35)"
+                : "0 3px 10px rgba(0,0,0,0.08)"
+                      }}
+                    >
+                      {t.icon}
+                      {t.name}
+                    </button>
 
-            <div
-              style={{
-                height: "500px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#666666",
-                fontSize: "16px",
-                textAlign: "center"
-              }}
-            >
+      ))}
+    </div>
 
-              <p>
-                Select clay body and glaze,
-                then click Predict.
-              </p>
+      
 
-            </div>
+      {tab === "Predict" && <PredictPage />}
 
-          )}
+      {tab === "How It Works" && <HowItWorksPage />}
 
-          {result && (
+      {tab === "Data" && <DataPage />}
 
-            <div>
+      {tab === "Model" && <ModelPage />}
 
-              <p style={{ marginBottom: "18px" }}>
-                <b>Material Type:</b>
-                <br />
-                {result.material_type}
-              </p>
-
-              <p style={{ marginBottom: "18px" }}>
-                <b>Surface Type:</b>
-                <br />
-                {result.surface_type}
-              </p>
-
-              <p style={{ marginBottom: "18px" }}>
-                <b>Transparency:</b>
-                <br />
-                {result.transparency_type}
-              </p>
-
-              {/* 3D PREVIEW */}
-
-              <h3 style={{ marginBottom: "12px" }}>
-                3D Preview
-              </h3>
-
-              <div
-                style={{
-                  width: "100%",
-                  height: "420px",
-                  backgroundColor: "#000000",
-                  borderRadius: "12px",
-                  overflow: "hidden",
-                  border: "1px solid #333333"
-                }}
-              >
-
-                <GlazeBall
-                  surface_type={result.surface_type}
-                  transparency_type={
-                    result.transparency_type
-                  }
-
-                  rgb_r={result.rgb.r}
-                  rgb_g={result.rgb.g}
-                  rgb_b={result.rgb.b}
-                />
-
-              </div>
-
-              {/* RGB */}
-
-              <p
-                style={{
-                  marginTop: "18px",
-                  fontSize: "16px"
-                }}
-              >
-
-                <b>RGB:</b>
-
-                {" "}
-
-                {result.rgb.r},
-
-                {" "}
-
-                {result.rgb.g},
-
-                {" "}
-
-                {result.rgb.b}
-
-              </p>
-
-            </div>
-
-          )}
-
-        </div>
-
-      </div>
+      {tab === "About" && <AboutPage />}
 
     </div>
 
   );
 
 }
-
-export default App;
